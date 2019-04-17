@@ -1,3 +1,6 @@
+Sub-Development branch was copied to Master on June 30th, 2016.
+==============
+
 MCP_CAN Library for Arduino
 ==============
 MCP_CAN library v1.5
@@ -23,6 +26,8 @@ The sendMsgBuf(ID, EXT, DLC, DATA) has not changed other than fixing return valu
 Using the setMode() function the sketch can now put the protocol controller into sleep, loop-back, or listen-only modes as well as normal operation.  Right now the code defaults to loop-back mode after the begin() function runs.  I have found this to increase the stability of filtering when the controller is initialized while connected to an active bus.
 
 User can enable and disable (default) One-Shot transmission mode from the sketch using enOneShotTX() or disOneShotTX() respectively.
+
+To wake up from CAN bus activity while in sleep mode enable the wake up interrupt with setSleepWakeup(1). Passing 0 will disable the wakeup interrupt (default).
 
 Installation
 ==============
