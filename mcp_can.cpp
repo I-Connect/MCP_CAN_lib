@@ -1046,8 +1046,17 @@ INT8U MCP_CAN::setMsg(INT32U id, INT8U rtr, INT8U ext, INT8U len, INT8U *pData)
     m_nRtr    = rtr;
     m_nExtFlg = ext;
     m_nDlc    = len;
-    for(i = 0; i<MAX_CHAR_IN_MESSAGE; i++)
+    Serial.print("setMsg: ");
+    Serial.println(id);
+    Serial.println(len);
+    for(i = 0; i<MAX_CHAR_IN_MESSAGE; i++) {
+      if (i < len) {
         m_nDta[i] = *(pData+i);
+      } else {
+        m_nDta[i] = 0;
+      }
+      Serial.println(m_nDta[i]);
+    }
 	
     return MCP2515_OK;
 }
@@ -1095,9 +1104,10 @@ INT8U MCP_CAN::sendMsg()
     {
         uiTimeOut++;        
         res1 = mcp2515_readRegister(txbuf_n-1);                         /* read send buff ctrl reg 	*/
-        res1 = res1 & 0x08;                               		
+        res1 = res1 & 0x08;        
     } while (res1 && (uiTimeOut < TIMEOUTVALUE));   
     
+    mcp2515_modifyRegister( txbuf_n-1 , MCP_TXB_TXREQ_M, 0x00 );        /* reset request bit */
     if(uiTimeOut == TIMEOUTVALUE)                                       /* send msg timeout             */	
         return CAN_SENDMSGTIMEOUT;
     
