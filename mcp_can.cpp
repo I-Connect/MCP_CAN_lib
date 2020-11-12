@@ -731,7 +731,7 @@ void MCP_CAN::mcp2515_write_canMsg( const INT8U buffer_sidh_addr)
     mcp2515_setRegisterS(mcp_addr+5, m_nDta, m_nDlc );                  /* write data bytes             */
 	
     if ( m_nRtr == 1)                                                   /* if RTR set bit in byte       */
-        m_nDlc = m_nDlc | MCP_RTR_MASK;
+      m_nDlc = m_nDlc | MCP_RTR_MASK;
 
     mcp2515_setRegister((mcp_addr+4), m_nDlc );                         /* write the RTR and DLC        */
     mcp2515_write_id(mcp_addr, m_nExtFlg, m_nID );                      /* write CAN id                 */
@@ -1046,16 +1046,12 @@ INT8U MCP_CAN::setMsg(INT32U id, INT8U rtr, INT8U ext, INT8U len, INT8U *pData)
     m_nRtr    = rtr;
     m_nExtFlg = ext;
     m_nDlc    = len;
-    Serial.print("setMsg: ");
-    Serial.println(id);
-    Serial.println(len);
     for(i = 0; i<MAX_CHAR_IN_MESSAGE; i++) {
       if (i < len) {
         m_nDta[i] = *(pData+i);
       } else {
         m_nDta[i] = 0;
       }
-      Serial.println(m_nDta[i]);
     }
 	
     return MCP2515_OK;
@@ -1102,6 +1098,7 @@ INT8U MCP_CAN::sendMsg()
     
     do
     {
+        delay(1);
         uiTimeOut++;        
         res1 = mcp2515_readRegister(txbuf_n-1);                         /* read send buff ctrl reg 	*/
         res1 = res1 & 0x08;        
@@ -1142,6 +1139,9 @@ INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U len, INT8U *buf)
  
     if((id & 0x40000000) == 0x40000000)
         rtr = 1;
+
+    // Strip ext and rtr bit from id
+    id = id & ~0xC0000000;
         
     setMsg(id, rtr, ext, len, buf);
     res = sendMsg();
