@@ -125,6 +125,7 @@ public:
     INT8U enOneShotTX(void);                                            // Enable one-shot transmission
     INT8U disOneShotTX(void);                                           // Disable one-shot transmission
 
+    void clearOverflowError(void);
     bool isRequestMessage();
 };
 

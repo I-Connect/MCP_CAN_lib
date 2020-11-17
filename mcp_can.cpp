@@ -1256,6 +1256,10 @@ INT8U MCP_CAN::getError(void)
     return mcp2515_readRegister(MCP_EFLG);
 }
 
+void MCP_CAN::clearOverflowError(void) {
+  mcp2515_modifyRegister(MCP_EFLG, MCP_EFLG_RX0OVR | MCP_EFLG_RX1OVR, 0x00);
+}
+
 /*********************************************************************************************************
 ** Function name:           mcp2515_errorCountRX
 ** Descriptions:            Returns REC register value
