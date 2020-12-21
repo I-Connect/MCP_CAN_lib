@@ -40,7 +40,7 @@ class MCP_CAN
     INT8U   m_nfilhit;                                                  // The number of the filter that matched the message
     INT8U   MCPCS;                                                      // Chip Select pin number
     INT8U   mcpMode;                                                    // Mode to return to after configurations are performed.
-    
+    INT8U   lastReadBuffer = 1;
 
 /*********************************************************************************************************
  *  mcp2515 driver function 

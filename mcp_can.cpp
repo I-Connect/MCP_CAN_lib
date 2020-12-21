@@ -571,7 +571,7 @@ INT8U MCP_CAN::mcp2515_init(const INT8U canIDMode, const INT8U canSpeed, const I
         mcp2515_initCANBuffers();
 
                                                                         /* interrupt mode               */
-        mcp2515_setRegister(MCP_CANINTE, MCP_RX0IF | MCP_RX1IF);
+        mcp2515_setRegister(MCP_CANINTE, MCP_RX0IF | MCP_RX1IF | MCP_ERRIF);
 
         switch(canIDMode)
         {
@@ -1159,21 +1159,42 @@ INT8U MCP_CAN::readMsg()
 
     stat = mcp2515_readStatus();
 
-    if ( stat & MCP_STAT_RX0IF )                                        /* Msg in Buffer 0              */
-    {
-        mcp2515_read_canMsg( MCP_RXBUF_0);
-        mcp2515_modifyRegister(MCP_CANINTF, MCP_RX0IF, 0);
-        res = CAN_OK;
-    }
-    else if ( stat & MCP_STAT_RX1IF )                                   /* Msg in Buffer 1              */
-    {
-        mcp2515_read_canMsg( MCP_RXBUF_1);
-        mcp2515_modifyRegister(MCP_CANINTF, MCP_RX1IF, 0);
-        res = CAN_OK;
-    }
-    else 
-        res = CAN_NOMSG;
-    
+    if (lastReadBuffer == 1) {
+      if ( stat & MCP_STAT_RX0IF )                                        /* Msg in Buffer 0              */
+      {
+          mcp2515_read_canMsg( MCP_RXBUF_0);
+          mcp2515_modifyRegister(MCP_CANINTF, MCP_RX0IF, 0);
+          lastReadBuffer = 0;
+          res = CAN_OK;
+      }
+      else if ( stat & MCP_STAT_RX1IF )                                   /* Msg in Buffer 1              */
+      {
+          mcp2515_read_canMsg( MCP_RXBUF_1);
+          mcp2515_modifyRegister(MCP_CANINTF, MCP_RX1IF, 0);
+          lastReadBuffer = 1;
+          res = CAN_OK;
+      }
+      else 
+          res = CAN_NOMSG;
+    } else {
+      if ( stat & MCP_STAT_RX1IF )                                        /* Msg in Buffer 0              */
+      {
+          mcp2515_read_canMsg( MCP_RXBUF_1);
+          mcp2515_modifyRegister(MCP_CANINTF, MCP_RX1IF, 0);
+          lastReadBuffer = 1;
+          res = CAN_OK;
+      }
+      else if ( stat & MCP_STAT_RX0IF )                                   /* Msg in Buffer 1              */
+      {
+          mcp2515_read_canMsg( MCP_RXBUF_0);
+          mcp2515_modifyRegister(MCP_CANINTF, MCP_RX0IF, 0);
+          lastReadBuffer = 0;
+          res = CAN_OK;
+      }
+      else 
+          res = CAN_NOMSG;
+
+    }    
     return res;
 }
 
