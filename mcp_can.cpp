@@ -1157,6 +1157,7 @@ INT8U MCP_CAN::readMsg()
 {
     INT8U stat, res;
 
+    delay(1); //make sure int register is reset before another readMsg is done
     stat = mcp2515_readStatus();
 
     if (lastReadBuffer == 1) {
@@ -1191,8 +1192,11 @@ INT8U MCP_CAN::readMsg()
           lastReadBuffer = 0;
           res = CAN_OK;
       }
-      else 
+      else {
           res = CAN_NOMSG;
+          //If this routine is called interrupt based and there is no message there is something wrong: reset int registers
+          mcp2515_modifyRegister(MCP_CANINTF, MCP_RX0IF | MCP_RX1IF, 0);
+      }
 
     }    
     return res;
@@ -1247,6 +1251,7 @@ INT8U MCP_CAN::readMsgBuf(INT32U *id, INT8U *len, INT8U buf[])
 INT8U MCP_CAN::checkReceive(void)
 {
     INT8U res;
+    delay(1);
     res = mcp2515_readStatus();                                         /* RXnIF in Bit 1 and 0         */
     if ( res & MCP_STAT_RXIF_MASK )
         return CAN_MSGAVAIL;
