@@ -1158,18 +1158,17 @@ INT8U MCP_CAN::readMsg()
     INT8U stat, res;
 
     stat = mcp2515_readStatus();
-    // Serial.println(stat);
-
-      if ( stat & MCP_STAT_RX1IF )                                   /* Msg in Buffer 1              */
-      {
-          mcp2515_read_canMsg( MCP_RXBUF_1);
-          mcp2515_modifyRegister(MCP_CANINTF, MCP_RX1IF, 0);
-          res = CAN_OK;
-      }
-      else if ( stat & MCP_STAT_RX0IF )                                        /* Msg in Buffer 0              */
+      
+      if ( stat & MCP_STAT_RX0IF )                                        /* Msg in Buffer 0              */
       {
           mcp2515_read_canMsg( MCP_RXBUF_0);
           mcp2515_modifyRegister(MCP_CANINTF, MCP_RX0IF, 0);
+          res = CAN_OK;
+      }
+      else if ( stat & MCP_STAT_RX1IF )                                   /* Msg in Buffer 1              */
+      {
+          mcp2515_read_canMsg( MCP_RXBUF_1);
+          mcp2515_modifyRegister(MCP_CANINTF, MCP_RX1IF, 0);
           res = CAN_OK;
       }
       else {
@@ -1177,8 +1176,6 @@ INT8U MCP_CAN::readMsg()
           //If this routine is called interrupt based and there is no message there is something wrong: reset int registers
           mcp2515_modifyRegister(MCP_CANINTF, MCP_RX0IF | MCP_RX1IF, 0);
       }
-    // Serial.print("*");  
-    // Serial.println(res);
     return res;
 }
 
